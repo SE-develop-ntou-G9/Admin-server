@@ -26,4 +26,9 @@ public class BlackListController {
     public ResponseEntity<List<BlacklistDto>> getBlacklist() {
         return blacklistService.getBlackList();
     }
+    @DeleteMapping("/blacklist/{id}")
+    public String deleteBlacklist(@PathVariable String id) {
+        blacklistService.delBlackList(id);
+        return "delete blacklist successfully!.";
+    }
 }

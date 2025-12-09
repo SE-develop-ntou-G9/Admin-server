@@ -48,4 +48,16 @@ public class BlacklistService {
                 .toList();
         return ResponseEntity.ok(dtos);
     }
+
+    public ResponseEntity<BlacklistEntity> delBlackList(String Id) {
+        // 1. 查資料
+        BlacklistEntity entity = blacklistRepository.findByUserId(Id)
+                .orElseThrow(() -> new RuntimeException("User not in blacklist"));
+        // 2. 刪除
+        blacklistRepository.delete(entity);
+        // 3. 回傳被刪除的資料
+        return ResponseEntity.ok(entity);
+    }
+
+
 }
