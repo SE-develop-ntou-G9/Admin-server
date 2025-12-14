@@ -22,24 +22,30 @@ public class BlacklistService {
         dto.setCreatedAt(entity.getCreatedAt());
         return dto;
     }
+    private BlacklistEntity toEntity(BlacklistDto dto) {
+        BlacklistEntity entity = new BlacklistEntity();
+        entity.setUserId(dto.getUserId());
+        entity.setReason(dto.getReason());
+        entity.setCreatedAt(LocalDateTime.now());
+        return entity;
+    }
 
 
     public BlacklistService(BlacklistRepository blacklistRepository) {
         this.blacklistRepository = blacklistRepository;
     }
 
-    public ResponseEntity<BlacklistEntity> addUserToBlacklist(BlacklistDto dto) {
+    public BlacklistDto addUserToBlacklist(BlacklistDto dto) {
         // 1. 建立 Entity
-        BlacklistEntity entity = new BlacklistEntity();
-        entity.setUserId(dto.getUserId());
-        entity.setReason(dto.getReason());
-        entity.setCreatedAt(LocalDateTime.now());
+        if (blacklistRepository.existsByUserId(dto.getUserId())) {
+            throw new UserAlreadyBlacklistedException(
+                    "userId already exists in blacklist"
+            );
+        }
         // 2. 交給 Repository 儲存
-        BlacklistEntity savedEntity = blacklistRepository.save(entity);
+        BlacklistEntity savedEntity = blacklistRepository.save(toEntity(dto));
 
-        return ResponseEntity
-                .status(HttpStatus.CREATED)  // 201 表示已建立
-                .body(savedEntity);          // 回傳儲存後的資料
+        return toDto(savedEntity);      // 回傳儲存後的資料
     }
 
     public ResponseEntity<List<BlacklistDto>> getBlackList(){
@@ -59,5 +65,11 @@ public class BlacklistService {
         return ResponseEntity.ok(entity);
     }
 
+    public class UserAlreadyBlacklistedException extends RuntimeException {
+
+        public UserAlreadyBlacklistedException(String message) {
+            super(message);
+        }
+    }
 
 }

@@ -3,6 +3,8 @@ package com.example.admin.controllers;
 import com.example.admin.dto.BlacklistDto;
 import com.example.admin.entity.BlacklistEntity;
 import com.example.admin.services.BlacklistService;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,9 +20,11 @@ public class BlackListController {
     }
 
     @PostMapping("/blacklist")
-    public String addToBlacklist(@RequestBody BlacklistDto dto) {
-        blacklistService.addUserToBlacklist(dto);
-        return "User added to blacklist.";
+    public ResponseEntity<BlacklistDto> addToBlacklist(@Valid @RequestBody BlacklistDto dto) {
+        BlacklistDto ResDto = blacklistService.addUserToBlacklist(dto);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(ResDto);
     }
     @GetMapping("/blacklist")
     public ResponseEntity<List<BlacklistDto>> getBlacklist() {
